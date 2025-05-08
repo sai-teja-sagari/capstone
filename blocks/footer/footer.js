@@ -10,11 +10,40 @@ export default async function decorate(block) {
   const footerMeta = getMetadata('footer');
   const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
   const fragment = await loadFragment(footerPath);
+  
+  console.log(block);
 
-  // decorate footer DOM
-  block.textContent = '';
-  const footer = document.createElement('div');
-  while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
+  block.textContent='';
+  const footerDivContainer=document.createElement('div');
+  const footerSocialDiv = document.createElement('div');
+  const footerSocialTextDiv = document.createElement('div');
+  const footerSocialIconsDiv = document.createElement('div');
+  const footerDivSpace=document.createElement('div');
+  footerDivSpace.classList.add('blank-space');
+  const footerClasses=['footer-nav','footer-text'];
+  let index=0;
+  while(fragment.firstElementChild){
+    fragment.firstElementChild.classList.add(footerClasses[index]);
+    footerDivContainer.append(fragment.firstElementChild)
+    if(index==0){
+      footerDivContainer.append(footerDivSpace);
+    }
+    index+=1;
+  }
 
-  block.append(footer);
+  const socials = footerDivContainer.querySelector('.default-content-wrapper p:last-child');
+  const socialIcons = socials.querySelectorAll('a');
+
+  footerSocialTextDiv.textContent = socials.textContent;
+  socialIcons.forEach((icon) => {
+    footerSocialIconsDiv.append(icon);
+  })
+
+  footerSocialDiv.append(footerSocialTextDiv);
+  footerSocialDiv.append(footerSocialIconsDiv);
+
+  socials.remove(); 
+
+  footerDivContainer.querySelector('.default-content-wrapper').append(footerSocialDiv);
+  block.append(footerDivContainer);
 }
